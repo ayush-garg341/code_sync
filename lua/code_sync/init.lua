@@ -36,6 +36,28 @@ function M.setup(user_config)
       return { "dev", "test", "stage", "--project", "--cwd" }
     end,
   })
+
+  -- List sync jobs command register
+  vim.api.nvim_create_user_command("CodeSyncList", function()
+    sync.list_jobs()
+  end, {})
+
+
+  -- Cancel sync job command register
+  vim.api.nvim_create_user_command("CodeSyncCancel", function(opts)
+    sync.cancel_job(opts.args)
+  end, {
+  nargs = 1,
+  complete = function()
+    sync.clean_jobs()
+    local job_ids = {}
+    for id, _ in pairs(sync.active_jobs) do
+      table.insert(job_ids, tostring(id))
+    end
+    return job_ids
+  end,
+})
+
 end
 
 return M
