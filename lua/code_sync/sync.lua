@@ -31,7 +31,9 @@ function M.run(env, mode)
     local cmd = protocols.build_command(protocol, keypath, local_path, remote)
     vim.notify(cmd)
     if cmd then
-      local output = vim.fn.system(cmd)
+      -- jobstart is async
+      -- system is sync
+      local output = vim.fn.jobstart(cmd)
       vim.notify("Synced to " .. remote .. ":\n" .. output)
     else
       vim.notify("Unsupported protocol: " .. protocol, vim.log.levels.ERROR)
