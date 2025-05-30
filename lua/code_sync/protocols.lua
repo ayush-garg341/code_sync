@@ -1,14 +1,36 @@
 local M = {}
 
-function M.build_command(protocol, keypath, local_path, remote_path)
+function M.build_command(protocol, local_path, remote_path, opts)
   if protocol == "rsync" then
-    return string.format("rsync -avz --update -e 'ssh -i %s' %s %s", keypath, local_path, remote_path)
+    local cmd = {
+      string.format("rsync -avz --update -e 'ssh -i %s'", opts.keypath)
+    }
+
+    -- Add excludes
+    if opts.exclude then
+      for _, pattern in ipairs(opts.exclude) do
+        table.insert(cmd, "--exclude=" .. pattern)
+      end
+    end
+
+    -- Add exclude file
+    if opts.exclude_file then
+      table.insert(cmd, "--exclude-from=" .. opts.exclude_file)
+    end
+
+    -- Source and destination
+    table.insert(cmd, local_path)
+    table.insert(cmd, remote_path)
+
+    local cmd_str = table.concat(cmd, " ")
+    return cmd_str
+
   elseif protocol == "scp" then
-    return string.format("scp -r %s %s %s", keypath, local_path, remote_path)
+    return string.format("scp -r %s %s %s", opts.keypath, local_path, remote_path)
   elseif protocol == "ftp" then
-    return string.format("lftp -e 'mirror -R %s %s %s; quit'", keypath, local_path, remote_path)
+    return string.format("lftp -e 'mirror -R %s %s %s; quit'", opts.keypath, local_path, remote_path)
   elseif protocol == "sftp" then
-    return string.format("sftp %s %s <<< $'put -r %s'", keypath, remote_path, local_path)
+    return string.format("sftp %s %s <<< $'put -r %s'", opts.keypath, local_path, remote_path)
   else
     return nil
   end

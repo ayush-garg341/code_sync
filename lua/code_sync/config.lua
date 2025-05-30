@@ -2,7 +2,7 @@ local M = {
   config_data = {},
 }
 
-function M.load(user_config)
+function M.load()
   local path = vim.fn.fnamemodify("~/.config" .. "/.code_sync.lua", ":p")
   local ok, data = pcall(dofile, path)
   if ok and data then

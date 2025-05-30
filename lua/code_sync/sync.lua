@@ -11,7 +11,7 @@ function M.run(env, mode)
   local keypath = config.get_key_path()
   local project_name = config.get_project_name()
 
-  if #remotes == 0 then
+  if type(remotes) ~= "table" then
     vim.notify("No remotes defined for environment: " .. env, vim.log.levels.WARN)
     return
   end
@@ -25,12 +25,20 @@ function M.run(env, mode)
     local_path = vim.fn.expand("%:p")
   end
 
-  for _, remote in ipairs(remotes) do
+  for _, server in ipairs(remotes) do
+    local dest = server.target
+    local exclude = server.exclude
+    local exclude_file = server.exclude_file
     rel_path = M.get_relative_file_path(local_path, project_name)
     if #rel_path > 0 then
       remote = remote .. "/" .. rel_path
     end
-    local cmd = protocols.build_command(protocol, keypath, local_path, remote)
+
+    local cmd = protocols.build_command(protocol, local_path, dest, {
+      keypath = keypath,
+      exclude = exclude,
+      exclude_file = exclude_file,
+    })
     vim.notify(cmd)
 
     local job_id = job_id_counter

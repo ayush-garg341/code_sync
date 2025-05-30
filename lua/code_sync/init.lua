@@ -3,8 +3,8 @@ local M = {}
 local config = require("code_sync.config")
 local sync = require("code_sync.sync")
 
-function M.setup(user_config)
-  config.load(user_config)
+function M.setup()
+  config.load()
 
   vim.api.nvim_create_user_command("CodeSync", function(opts)
     local args = {}
