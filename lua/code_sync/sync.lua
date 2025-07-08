@@ -8,7 +8,6 @@ local job_id_counter = 1
 function M.run(env, mode)
   local protocol = config.get_protocol()
   local remotes = config.get_targets(env)
-  local keypath = config.get_key_path()
   local project_name = config.get_project_name()
 
   if type(remotes) ~= "table" then
@@ -29,6 +28,8 @@ function M.run(env, mode)
     local dest = server.target
     local exclude = server.exclude
     local exclude_file = server.exclude_file
+    local method = server.method
+    local keypath = server.keypath
     rel_path = M.get_relative_file_path(local_path, project_name)
     if #rel_path > 0 then
       remote = remote .. "/" .. rel_path
@@ -38,6 +39,7 @@ function M.run(env, mode)
       keypath = keypath,
       exclude = exclude,
       exclude_file = exclude_file,
+      method = method,
     })
     vim.notify(cmd)
 

@@ -2,9 +2,28 @@ local M = {}
 
 function M.build_command(protocol, local_path, remote_path, opts)
   if protocol == "rsync" then
-    local cmd = {
-      string.format("rsync -avz --update -e 'ssh -i %s'", opts.keypath)
-    }
+
+    local cmd
+
+    if opts.method == "pwd_based" then
+      cmd = {
+        string.format("sshpass -p %q rsync -avz --update -e ssh", opts.keypath)
+      }
+
+    elseif opts.method == "pem" then
+      cmd = {
+        string.format("rsync -avz --update -e 'ssh -i %s'", opts.keypath)
+      }
+
+    elseif opts.method == "ssh_key" then
+      cmd = {
+        string.format("rsync -avz --update ")
+      }
+
+    else
+      error("Unknown method: " .. tostring(opts.method))
+
+    end
 
     -- Add excludes
     if opts.exclude then
