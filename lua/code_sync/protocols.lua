@@ -7,17 +7,17 @@ function M.build_command(protocol, local_path, remote_path, opts)
 
     if opts.method == "pwd_based" then
       cmd = {
-        string.format("sshpass -p %q rsync -avz --update -e ssh", opts.keypath)
+        string.format("sshpass -p %q rsync -avz --delete --update -e ssh", opts.keypath)
       }
 
     elseif opts.method == "pem" then
       cmd = {
-        string.format("rsync -avz --update -e 'ssh -i %s'", opts.keypath)
+        string.format("rsync -avz --delete --update -e 'ssh -i %s'", opts.keypath)
       }
 
     elseif opts.method == "ssh_key" then
       cmd = {
-        string.format("rsync -avz --update ")
+        string.format("rsync -avz --delete --update ")
       }
 
     else
