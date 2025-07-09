@@ -10,7 +10,7 @@
 
 - Let's understand the keys in below config
     - **protocol**:- one of the scp, rsync, ftp, sftp. Currently supported only rsync.
-    - **key_path**:- where our pem file is located
+    - **keypath**:- where our pem file is located
     - **["data-science"], user_agent** ...:- these are the currently opened folders in neovim, which we want to sync. It works as a source.
         - **test, stage, dev**:- These are the key for environent on which we want to sync the code.
             - This is an array, not a single entry as we might want to sync the code on different test, stage, dev servers.
@@ -28,7 +28,7 @@
         target = "ayush@<hostname>:/home/ayush/data-science",
         -- exclude = { "venv", "feature_prototypes", "results", "experiments", ".git", ".coveragerc", ".pre-commit-config.yaml", "klm-218.txt"}
         exclude_file = "/Users/elliott/.rsyncignore",
-        key_path = " ~/Downloads/some.pem",
+        keypath= " ~/Downloads/some.pem",
         method = "pem"
       }  
     },
@@ -38,7 +38,7 @@
       {
         target = "ayush@<hostname>:/home/ayush/user_agent",
         exclude_file = "/home/ayush/.rsyncignore",
-        key_path = " ~/Downloads/some.pem",
+        keypath= " ~/Downloads/some.pem",
         method = "pem"
       } 
     }
@@ -47,7 +47,7 @@
     test = { 
       {
         target = "ayush@<hostname>:/home/ayush/redis_full_dv_process",
-        key_path = " ~/Downloads/some.pem",
+        keypath= " ~/Downloads/some.pem",
         method = "pem"
       } 
     }
@@ -96,7 +96,7 @@ Host *.local
         target = "<HostName from config>:/home/ayush/data-science",
         -- exclude = { "venv", "feature_prototypes", "results", "experiments", ".git", ".coveragerc", ".pre-commit-config.yaml", "klm-218.txt"}
         exclude_file = "/Users/elliott/.rsyncignore",
-        key_path = "",
+        keypath= "",
         method = "ssh_key"
       }  
     },
@@ -106,7 +106,7 @@ Host *.local
       {
         target = "<HostName from config>:/home/ayush/user_agent",
         exclude_file = "/home/ayush/.rsyncignore",
-        key_path = "",
+        keypath= "",
         method = "ssh_key"
       } 
     }
@@ -115,7 +115,7 @@ Host *.local
     test = { 
       {
         target = "<HostName from config>:/home/ayush/redis_full_dv_process",
-        key_path = "",
+        keypath= "",
         method = "ssh_key"
       } 
     }
@@ -127,8 +127,13 @@ Host *.local
 - Lua config for the case where we are using plain password to ssh.
 ```bash
 
+# On Linux system
+
 sudo apt install sshpass
 sshpass -p 'yourpassword' ssh user@host
+
+# On macos
+brew install hudochenkov/sshpass/sshpass
 
 ```
 
@@ -142,7 +147,7 @@ sshpass -p 'yourpassword' ssh user@host
         target = "ayush@<hostname>:/home/ayush/data-science",
         -- exclude = { "venv", "feature_prototypes", "results", "experiments", ".git", ".coveragerc", ".pre-commit-config.yaml", "klm-218.txt"}
         exclude_file = "/Users/elliott/.rsyncignore",
-        key_path = "yourpassword",
+        keypath= "yourpassword",
         method = "pwd_based"
       }  
     },
@@ -152,7 +157,7 @@ sshpass -p 'yourpassword' ssh user@host
       {
         target = "ayush@<hostname>:/home/ayush/user_agent",
         exclude_file = "/home/ayush/.rsyncignore",
-        key_path = "yourpassword",
+        keypath= "yourpassword",
         method = "pwd_based"
       } 
     }
@@ -161,7 +166,7 @@ sshpass -p 'yourpassword' ssh user@host
     test = { 
       {
         target = "ayush@<hostname>:/home/ayush/redis_full_dv_process",
-        key_path = "yourpassword",
+        keypath= "yourpassword",
         method = "pwd_based"
       } 
     }
