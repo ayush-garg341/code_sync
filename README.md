@@ -103,6 +103,7 @@ Host *.local
 
 ```bash
 
+# You can do ssh now like this.
 ssh myserver
 ssh workserver
 ssh mypi
@@ -167,7 +168,7 @@ brew install hudochenkov/sshpass/sshpass
   ["data-science"] = {
     test = {
       {
-        target = "ayush@<hostname>:/home/ayush/data-science",
+        target = "ayush@<host>:/home/ayush/data-science",
         -- exclude = { "venv", "feature_prototypes", "results", "experiments", ".git", ".coveragerc", ".pre-commit-config.yaml", "klm-218.txt"}
         exclude_file = "/Users/elliott/.rsyncignore",
         keypath= "yourpassword",
@@ -178,7 +179,7 @@ brew install hudochenkov/sshpass/sshpass
   user_agent = {
     test = { 
       {
-        target = "ayush@<hostname>:/home/ayush/user_agent",
+        target = "ayush@<host>:/home/ayush/user_agent",
         exclude_file = "/home/ayush/.rsyncignore",
         keypath= "yourpassword",
         method = "pwd_based"
@@ -188,7 +189,7 @@ brew install hudochenkov/sshpass/sshpass
   redis_full_dv_process = {
     test = { 
       {
-        target = "ayush@<hostname>:/home/ayush/redis_full_dv_process",
+        target = "ayush@<host>:/home/ayush/redis_full_dv_process",
         keypath= "yourpassword",
         method = "pwd_based"
       } 
@@ -200,5 +201,5 @@ brew install hudochenkov/sshpass/sshpass
 
 - If we are doing ssh on a port other than 22, then we should pass this port parameter at appropriate places in the lua config.
     - If we are using `~/.ssh/config` file, we can mention the port in that file.
-    - Else we can pass it like `ssh -p <port> user@host`. We have to change our `target` key and append `-p <port>` in the beginning of the command.
+    - Else we can pass it like `ssh -p <port> user@host`. We have to change our `target` key and append `-p <port>` in the beginning of the command like `-p <port> user@host:/some/location`
 
