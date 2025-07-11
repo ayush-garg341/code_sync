@@ -29,7 +29,7 @@
         -- exclude = { "venv", "feature_prototypes", "results", "experiments", ".git", ".coveragerc", ".pre-commit-config.yaml", "klm-218.txt"}
         exclude_file = "/Users/elliott/.rsyncignore",
         keypath= " ~/Downloads/some.pem",
-        method = "pem"
+        method = "key_based"
       }  
     },
   },
@@ -39,7 +39,7 @@
         target = "ayush@<hostname>:/home/ayush/user_agent",
         exclude_file = "/home/ayush/.rsyncignore",
         keypath= " ~/Downloads/some.pem",
-        method = "pem"
+        method = "key_based"
       } 
     }
   },
@@ -47,8 +47,8 @@
     test = { 
       {
         target = "ayush@<hostname>:/home/ayush/redis_full_dv_process",
-        keypath= " ~/Downloads/some.pem",
-        method = "pem"
+        keypath= "~/.ssh/id_rsa",
+        method = "key_based"
       } 
     }
   }
@@ -57,23 +57,38 @@
 
 ```
 
-- Lua config for the case where we have config stored at ~/.ssh/config like shown below:
+- Lua config for the case where we are not passing any key during ssh:
+
+```bash
+
+# Generate SSH key on your client
+ssh-keygen -t rsa -b 4096 -C "yourname@yourhost"
+
+# Copy the public key to your server: You will be prompted for pwd one last time.
+ssh-copy-id -i <file_path> ubuntu@192.168.1.42
+
+# user - ubuntu, host - 192.168.1.42
+ssh ubuntu@192.168.1.42
+
+```
 
 ```yaml
 
-# Entry for home server
+# Store the hostname in a config file for shorter login
+
+# Entry for home server, hostname - myserver
 Host myserver
     HostName 192.168.1.42
     User ubuntu
     IdentityFile ~/.ssh/id_rsa
 
 # Entry for work server
-Host workserver
+Host workserver, hostname - workserver
   HostName 10.0.0.5
   User devops
   IdentityFile ~/.ssh/id_work
 
-# Entry using custom port
+# Entry using custom port, hostname - mypi
 Host mypi
   HostName 192.168.1.100
   User pi
@@ -86,6 +101,14 @@ Host *.local
   IdentityFile ~/.ssh/id_rsa
 ```
 
+```bash
+
+ssh myserver
+ssh workserver
+ssh mypi
+
+```
+
 ```lua
 
 {
@@ -93,11 +116,11 @@ Host *.local
   ["data-science"] = {
     test = {
       {
-        target = "<HostName from config>:/home/ayush/data-science",
+        target = "user@host:/home/ayush/data-science",
         -- exclude = { "venv", "feature_prototypes", "results", "experiments", ".git", ".coveragerc", ".pre-commit-config.yaml", "klm-218.txt"}
         exclude_file = "/Users/elliott/.rsyncignore",
         keypath= "",
-        method = "ssh_key"
+        method = "key_less"
       }  
     },
   },
@@ -107,7 +130,7 @@ Host *.local
         target = "<HostName from config>:/home/ayush/user_agent",
         exclude_file = "/home/ayush/.rsyncignore",
         keypath= "",
-        method = "ssh_key"
+        method = "key_less"
       } 
     }
   },
@@ -116,7 +139,7 @@ Host *.local
       {
         target = "<HostName from config>:/home/ayush/redis_full_dv_process",
         keypath= "",
-        method = "ssh_key"
+        method = "key_less"
       } 
     }
   }
@@ -174,3 +197,8 @@ brew install hudochenkov/sshpass/sshpass
 }
 
 ```
+
+- If we are doing ssh on a port other than 22, then we should pass this port parameter at appropriate places in the lua config.
+    - If we are using `~/.ssh/config` file, we can mention the port in that file.
+    - Else we can pass it like `ssh -p <port> user@host`. We have to change our `target` key and append `-p <port>` in the beginning of the command.
+
