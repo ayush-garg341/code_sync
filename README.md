@@ -1,258 +1,220 @@
-### What it does and what is the need.
-- I was looking for a simple package to sync my code to remote server. I love to code in neovim and it's my primary code editor with all the package and themes I love.
-- I found that some already existing packages provide too much than needed and configuring them is a nightmare while it should not be.
-- So here is this simple package, completely written in lua and which does only one job i.e syncing the code from local computer to remote server.
-- You just have to define the configuration in ~/.config/.code_sync.lua and you are good to go. Below I have demonstrated and explained how to create this config.
-- If you love this package and wanna contribute, I have list of todos in future, pick one and ship.
+# 🔁 code_sync.nvim
 
-### How to install
-- Via Packer or check reference [here](https://github.com/ayush-garg341/Neovim-from-scratch-ayush/blob/feature/personal-nvim-config/lua/user/plugins.lua#L113)
+> A lightweight Neovim plugin to sync your local code to remote servers with minimal configuration.
+
+---
+
+## ✨ What It Does & Why It Exists
+
+- I wanted a **simple, minimal plugin** to sync code from my local machine to a remote server while coding in Neovim—my go-to editor.
+- Existing plugins were either too bloated or difficult to configure.
+- So I built this: a **single-purpose, Lua-based plugin** that does one thing well—**syncing code from local to remote**.
+- You just need to define your sync configuration in `~/.config/.code_sync.lua`, and you're ready to go!
+- If you find this plugin useful and want to contribute, check out the [🛠️ Future Todos](#-future-todos) section.
+
+---
+
+## 📦 Installation
+
+Install using [packer.nvim](https://github.com/wbthomason/packer.nvim):
+
 ```lua
-  use({
-      "ayush-garg341/code_sync",
-      config = function()
+use({
+    "ayush-garg341/code_sync",
+    config = function()
         require("code_sync").setup()
-      end,
-  })
-
+    end,
+})
 ```
 
-### Sync code from local to remote dir ( INPROGRESS )
-- Neovim package to sync code from local dir to remote dir.
-- Currently supporting `rsync` only but in future plan to support `scp`, `sftp` as well.
-- Support different ssh mechanisms.
+Or refer to [this config reference](https://github.com/ayush-garg341/Neovim-from-scratch-ayush/blob/feature/personal-nvim-config/lua/user/plugins.lua#L113).
 
-### Sample config file.
-- This file should be saved as ~/.config/.code_sync.lua
+---
 
-- Config for the case where we have separate **pem file** to ssh.
+## 🚀 Features (In Progress)
 
-- Let's understand the keys in below config
-    - **protocol**:- one of the scp, rsync, ftp, sftp. Currently supported only rsync.
-    - **keypath**:- where our pem file is located
-    - **["data-science"], user_agent** ...:- these are the currently opened folders in neovim, which we want to sync. It works as a source.
-        - **test, stage, dev**:- These are the key for environent on which we want to sync the code.
-            - This is an array, not a single entry as we might want to sync the code on different test, stage, dev servers.
-        - **target**:- this is the destination server and the location on which we want to sync the current code.
-        - **exclude_file**:- .rsync_ignore, this is the file like .gitignore which contains the files and folders to ignore.
-        - **exclude**:- Individual files and folders to ignore.
+- Sync local directories to remote servers.
+- Currently supports: `rsync` (more protocols like `scp`, `sftp` coming soon).
+- Support for different SSH methods: password-based, key-based, keyless.
+
+---
+
+## 🛠️ Sample Configuration
+
+Save your config in: `~/.config/.code_sync.lua`
+
+### 🔐 Key-Based SSH (e.g. using a `.pem` file)
 
 ```lua
-
 {
   protocol = "rsync",
   ["data-science"] = {
     test = {
       {
         target = "ayush@<hostname>:/home/ayush/data-science",
-        -- exclude = { "venv", "feature_prototypes", "results", "experiments", ".git", ".coveragerc", ".pre-commit-config.yaml", "klm-218.txt"}
         exclude_file = "/Users/elliott/.rsyncignore",
-        keypath= " ~/Downloads/some.pem",
+        keypath = "~/Downloads/some.pem",
         method = "key_based"
-      }  
-    },
-  },
-  user_agent = {
-    test = { 
-      {
-        target = "ayush@<hostname>:/home/ayush/user_agent",
-        exclude_file = "/home/ayush/.rsyncignore",
-        keypath= " ~/Downloads/some.pem",
-        method = "key_based"
-      } 
+      }
     }
   },
-  redis_full_dv_process = {
-    test = { 
-      {
-        target = "ayush@<hostname>:/home/ayush/redis_full_dv_process",
-        keypath= "~/.ssh/id_rsa",
-        method = "key_based"
-      } 
-    }
-  }
+  ...
 }
-
-
 ```
 
-- Lua config for the case where we are not passing any key during ssh:
+---
+
+### 🔑 Keyless SSH (Public Key copied to server)
+
+**Steps:**
 
 ```bash
-
-# Generate SSH key on your client
 ssh-keygen -t rsa -b 4096 -C "yourname@yourhost"
-
-# Copy the public key to your server: You will be prompted for pwd one last time.
-ssh-copy-id -i <file_path> ubuntu@192.168.1.42
-
-# user - ubuntu, host - 192.168.1.42
-ssh ubuntu@192.168.1.42
-
+ssh-copy-id -i ~/.ssh/id_rsa.pub user@host
 ```
 
-```yaml
+Update `~/.ssh/config` for shorthand access:
 
-# Store the hostname in a config file for shorter login
-
-# Entry for home server, hostname - myserver
+```ini
 Host myserver
-    HostName 192.168.1.42
-    User ubuntu
-    IdentityFile ~/.ssh/id_rsa
+  HostName 192.168.1.42
+  User ubuntu
+  IdentityFile ~/.ssh/id_rsa
 
-# Entry for work server
-Host workserver, hostname - workserver
+Host workserver
   HostName 10.0.0.5
   User devops
   IdentityFile ~/.ssh/id_work
+```
 
-# Entry using custom port, hostname - mypi
+**Sample Lua config:**
+
+```lua
+{
+  protocol = "rsync",
+  ["project-name"] = {
+    test = {
+      {
+        target = "myserver:/home/ubuntu/project-name",
+        exclude_file = "~/.rsyncignore",
+        method = "key_less"
+      }
+    }
+  }
+}
+```
+
+---
+
+### 🔓 Password-Based SSH
+
+**Install `sshpass`:**
+
+```bash
+# Linux
+sudo apt install sshpass
+
+# macOS
+brew install hudochenkov/sshpass/sshpass
+```
+
+**Lua Config:**
+
+```lua
+{
+  protocol = "rsync",
+  ["project-name"] = {
+    test = {
+      {
+        target = "user@host:/home/user/project-name",
+        keypath = "yourpassword",
+        method = "pwd_based"
+      }
+    }
+  }
+}
+```
+
+--- 
+
+### 🧾 Configuration Key Reference
+
+Let's understand the keys used in the config:
+
+- **protocol**: One of the supported sync methods: `scp`, `rsync`, `ftp`, `sftp`.  
+  _(Currently, only `rsync` is supported.)_
+- **keypath**: Path to the SSH private key (`.pem`) file for authentication.
+- **["data-science"], user_agent, redis_full_dv_process, ...**:  
+  These represent the **currently opened folders** in Neovim which you want to sync. These act as source identifiers.
+  - **test, stage, dev**:  
+    Environment keys indicating where the code should be synced.
+    - Each environment key holds an array of targets.  
+      _(You can sync code to multiple `test`, `stage`, or `dev` servers.)_
+  - **target**: Destination server and directory where code should be synced.
+  - **exclude_file**: Path to a file like `.rsync_ignore` that lists files/folders to be excluded from syncing (similar to `.gitignore`).
+  - **exclude**: Inline list of files/folders to be excluded (array).
+
+---
+
+### 🔁 Using Custom Ports
+
+- Define ports in your `~/.ssh/config`:
+```ini
 Host mypi
   HostName 192.168.1.100
   User pi
   Port 2222
   IdentityFile ~/.ssh/id_rsa
-
-# Wildcard example
-Host *.local
-  User ubuntu
-  IdentityFile ~/.ssh/id_rsa
 ```
 
-```bash
+- Or modify the `target` string to include `-p <port>` before the SSH address.
 
-# You can do ssh now like this.
-ssh myserver
-ssh workserver
-ssh mypi
+---
 
+## 🧪 Usage
+
+Three commands are currently supported:
+
+| Command            | Description                                                  |
+|--------------------|--------------------------------------------------------------|
+| `:CodeSync`        | Syncs code to the defined environment (test/stage/dev).      |
+| `:CodeSyncList`    | Shows running sync jobs with their job IDs.                  |
+| `:CodeSyncCancel`  | Cancels a sync job given its ID.                             |
+
+### 🔧 Example
+
+```vim
+:CodeSync test --project   " Sync entire project to test env
+:CodeSync test --cwd       " Sync current directory to test env
+:CodeSync dev              " Sync current file to dev env
 ```
 
-```lua
+❗**Note:** `prod` sync is intentionally not supported. Production sync should go through CI/CD pipelines.
 
-{
-  protocol = "rsync",
-  ["data-science"] = {
-    test = {
-      {
-        target = "user@host:/home/ayush/data-science",
-        -- exclude = { "venv", "feature_prototypes", "results", "experiments", ".git", ".coveragerc", ".pre-commit-config.yaml", "klm-218.txt"}
-        exclude_file = "/Users/elliott/.rsyncignore",
-        keypath= "",
-        method = "key_less"
-      }  
-    },
-  },
-  user_agent = {
-    test = { 
-      {
-        target = "<HostName from config>:/home/ayush/user_agent",
-        exclude_file = "/home/ayush/.rsyncignore",
-        keypath= "",
-        method = "key_less"
-      } 
-    }
-  },
-  redis_full_dv_process = {
-    test = { 
-      {
-        target = "<HostName from config>:/home/ayush/redis_full_dv_process",
-        keypath= "",
-        method = "key_less"
-      } 
-    }
-  }
-}
+---
 
-```
+## 📋 Future Todos
 
-- Lua config for the case where we are using plain password to ssh.
-```bash
+- ✅ Add support for `scp`, `sftp`
+- 📊 Better logging for sync success/failure
+- ⏱️ Auto-sync at user-defined intervals
+- 🧠 Smarter file tracking and change detection
 
-# On Linux system
+---
 
-sudo apt install sshpass
-sshpass -p 'yourpassword' ssh user@host
+## 🤝 Contributing
 
-# On macos
-brew install hudochenkov/sshpass/sshpass
+All contributions are welcome! 🚀
 
-```
+### 📌 How to Contribute
 
-```lua
+1. Fork the repository
+2. Create a new branch: `git checkout -b my-feature`
+3. Make your changes and test thoroughly
+4. Commit and push: `git commit -m "Add new feature"` then `git push origin my-feature`
+5. Open a Pull Request with a description of what you’ve changed
 
-{
-  protocol = "rsync",
-  ["data-science"] = {
-    test = {
-      {
-        target = "ayush@<host>:/home/ayush/data-science",
-        -- exclude = { "venv", "feature_prototypes", "results", "experiments", ".git", ".coveragerc", ".pre-commit-config.yaml", "klm-218.txt"}
-        exclude_file = "/Users/elliott/.rsyncignore",
-        keypath= "yourpassword",
-        method = "pwd_based"
-      }  
-    },
-  },
-  user_agent = {
-    test = { 
-      {
-        target = "ayush@<host>:/home/ayush/user_agent",
-        exclude_file = "/home/ayush/.rsyncignore",
-        keypath= "yourpassword",
-        method = "pwd_based"
-      } 
-    }
-  },
-  redis_full_dv_process = {
-    test = { 
-      {
-        target = "ayush@<host>:/home/ayush/redis_full_dv_process",
-        keypath= "yourpassword",
-        method = "pwd_based"
-      } 
-    }
-  }
-}
+---
 
-```
-
-- If we are doing ssh on a port other than 22, then we should pass this port parameter at appropriate places in the lua config.
-    - If we are using `~/.ssh/config` file, we can mention the port in that file.
-    - Else we can pass it like `ssh -p <port> user@host`. We have to change our `target` key and append `-p <port>` in the beginning of the command like `-p <port> user@host:/some/location`
-
-### Usage
-- Right now 3 commands are supported.
-    - `CodeSync`
-    - `CodeSyncCancel`
-    - `CodeSyncList`
-
-- CodeSync -> This command is responsible to sync the code between your local dir and remote dir. It supports two options:
-```bash
-# This command will sync the current whole project opened in neovim on test environment defined in ~/.config/.code_sync.lua
-:CodeSync test --project
-
-# Similarly to sync current working directory, we will use --cwd. By default if no option is passed, it will sync the current file.
-# Similar to test, we can pass stage/dev which will sync the code on stage and dev environent. 
-```
-- Not added the support for prod key intentionally, because on prod code must go through proper CI/CD not via rsync.
-
-- CodeSyncList -> This command will list current syncing commands in progress along with their ID. You can use this ID to cancel the sync.
-```bash
-:CodeSyncList
-```
-
-- CodeSyncCancel -> This command will cancel the sync job given the ID of the job.
-```bash
-:CodeSyncCancel <job_id>
-```
-
-### Future Todos
-- Add better logging/output for sync success or fail.
-- Add auto sync at regular intervals, time interval can be defined by the user.
-- Add support for `scp` and `sftp`.
-
-### Contributions
-- This project is open source, you can fork the repo and create PR.
+> Made with ❤️ by [@ayush-garg341](https://github.com/ayush-garg341)
 
