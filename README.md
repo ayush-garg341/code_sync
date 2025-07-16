@@ -1,7 +1,26 @@
+### What it does and what is the need.
+- I was looking for a simple package to sync my code to remote server. I love to code in neovim and it's my primary code editor with all the package and themes I love.
+- I found that some already existing packages provide too much than needed and configuring them is a nightmare while it should not be.
+- So here is this simple package, completely written in lua and which does only one job i.e syncing the code from local computer to remote server.
+- You just have to define the configuration in ~/.config/.code_sync.lua and you are good to go. Below I have demonstrated and explained how to create this config.
+- If you love this package and wanna contribute, I have list of todos in future, pick one and ship.
+
+### How to install
+- Via Packer or check reference [here](https://github.com/ayush-garg341/Neovim-from-scratch-ayush/blob/feature/personal-nvim-config/lua/user/plugins.lua#L113)
+```lua
+  use({
+      "ayush-garg341/code_sync",
+      config = function()
+        require("code_sync").setup()
+      end,
+  })
+
+```
+
 ### Sync code from local to remote dir ( INPROGRESS )
 - Neovim package to sync code from local dir to remote dir.
-- Support scp, sftp, rysnc
-- Support different ssh mechanisms
+- Currently supporting `rsync` only but in future plan to support `scp`, `sftp` as well.
+- Support different ssh mechanisms.
 
 ### Sample config file.
 - This file should be saved as ~/.config/.code_sync.lua
@@ -202,4 +221,38 @@ brew install hudochenkov/sshpass/sshpass
 - If we are doing ssh on a port other than 22, then we should pass this port parameter at appropriate places in the lua config.
     - If we are using `~/.ssh/config` file, we can mention the port in that file.
     - Else we can pass it like `ssh -p <port> user@host`. We have to change our `target` key and append `-p <port>` in the beginning of the command like `-p <port> user@host:/some/location`
+
+### Usage
+- Right now 3 commands are supported.
+    - `CodeSync`
+    - `CodeSyncCancel`
+    - `CodeSyncList`
+
+- CodeSync -> This command is responsible to sync the code between your local dir and remote dir. It supports two options:
+```bash
+# This command will sync the current whole project opened in neovim on test environment defined in ~/.config/.code_sync.lua
+:CodeSync test --project
+
+# Similarly to sync current working directory, we will use --cwd. By default if no option is passed, it will sync the current file.
+# Similar to test, we can pass stage/dev which will sync the code on stage and dev environent. 
+```
+- Not added the support for prod key intentionally, because on prod code must go through proper CI/CD not via rsync.
+
+- CodeSyncList -> This command will list current syncing commands in progress along with their ID. You can use this ID to cancel the sync.
+```bash
+:CodeSyncList
+```
+
+- CodeSyncCancel -> This command will cancel the sync job given the ID of the job.
+```bash
+:CodeSyncCancel <job_id>
+```
+
+### Future Todos
+- Add better logging/output for sync success or fail.
+- Add auto sync at regular intervals, time interval can be defined by the user.
+- Add support for `scp` and `sftp`.
+
+### Contributions
+- This project is open source, you can fork the repo and create PR.
 
