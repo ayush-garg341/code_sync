@@ -1,6 +1,6 @@
 # 🔁 code_sync.nvim
 
-> A lightweight Neovim plugin to sync your local code to remote servers with minimal configuration.
+> A lightweight Neovim plugin to sync your local code to remote servers with minimal configuration. Runs in background, does not freeze the main window.
 
 ---
 
@@ -195,10 +195,11 @@ Three commands are currently supported:
 
 ## 📋 Future Todos
 
-- ✅ Add support for `scp`, `sftp`
+- 🔄 **Hot-reload support**: Automatically refreshes the config file on-the-fly when updated — no need to restart Neovim.
 - 📊 Better logging for sync success/failure
 - ⏱️ Auto-sync at user-defined intervals
 - 🧠 Smarter file tracking and change detection
+- ✅ Add support for `scp`, `sftp`.
 
 ---
 
