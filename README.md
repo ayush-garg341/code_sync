@@ -195,9 +195,10 @@ Three commands are currently supported:
 
 ## 📋 Future Todos
 
+- 🧪 Support dry run of rsync command before actually start syncing (emphasizes testing safely)
 - 🔄 **Hot-reload support**: Automatically refreshes the config file on-the-fly when updated — no need to restart Neovim.
 - 📊 Better logging for sync success/failure
-- ⏱️ Auto-sync at user-defined intervals
+- ⏱️  Auto-sync at user-defined intervals
 - 🧠 Smarter file tracking and change detection
 - ✅ Add support for `scp`, `sftp`.
 
