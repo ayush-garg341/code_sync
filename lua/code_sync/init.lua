@@ -12,7 +12,7 @@ function M.setup()
       table.insert(args, word)
     end
 
-    local env = args[1] or "dev"
+    local env = args[1]
     local scope = args[2] or "file"
 
     if env ~= "dev" and env ~= "test" and env ~= "stage" then

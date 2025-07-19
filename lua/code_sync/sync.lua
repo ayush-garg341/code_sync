@@ -32,7 +32,7 @@ function M.run(env, mode)
     local keypath = server.keypath
     rel_path = M.get_relative_file_path(local_path, project_name)
     if #rel_path > 0 then
-      remote = remote .. "/" .. rel_path
+      dest = dest .. "/" .. rel_path
     end
 
     local cmd = protocols.build_command(protocol, local_path, dest, {
